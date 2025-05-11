@@ -161,9 +161,9 @@
   * 实现`ConfigUtil`类，加载配置文件，获得转化后的配置对象
   * 实现`KRpcApplication`类，维护全局对象
 * 添加序列化方式
-  * Hessian
-  * Kryo
-  * Protostuff
+  * `Hessian`
+  * `Kryo`
+  * `Protostuff`
 * SPI机制
   * 配置文件序列化名->对应序列化对象的映射
 * 日志链路追踪实现
