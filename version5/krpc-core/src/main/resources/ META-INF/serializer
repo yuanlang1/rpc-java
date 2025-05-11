@@ -1,0 +1,5 @@
+Hessian=com.yl.serializer.mySerializer.Impl.HessianSerializer
+protobuf=com.yl.serializer.mySerializer.Impl.ProtoStuffSerializer
+json=com.yl.serializer.mySerializer.Impl.JsonSerializer
+kryo=com.yl.serializer.mySerializer.Impl.KryoSerializer
+jdk=com.yl.serializer.mySerializer.Impl.ObjectSerializer

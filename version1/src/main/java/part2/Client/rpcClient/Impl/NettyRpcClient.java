@@ -1,0 +1,60 @@
+package part2.Client.rpcClient.Impl;
+
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.AttributeKey;
+import part1.Common.Message.RpcRequest;
+import part1.Common.Message.RpcResponse;
+import part2.Client.netty.nettyInitializer.NettyClientInitializer;
+import part2.Client.rpcClient.RpcClient;
+
+/**
+ * @author yl
+ * @date 2025-05-05 20:54
+ */
+public class NettyRpcClient implements RpcClient {
+    private String host;
+    private int port;
+    private static final Bootstrap bootstrap;   // 启动客户端的对象 负责连接配置
+    private static final EventLoopGroup eventLoopGroup; // 线程池 NIO
+
+    public NettyRpcClient(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
+
+    // 初始化客户端
+    static {
+        eventLoopGroup = new NioEventLoopGroup();
+        bootstrap = new Bootstrap();
+        bootstrap.group(eventLoopGroup).channel(NioSocketChannel.class)
+                .handler(new NettyClientInitializer());  // 自定义消息处理逻辑
+    }
+
+    @Override
+    public RpcResponse sendRequest(RpcRequest request) {
+        try {
+            // 创建一个channelFuture， 代表一个操作事件，sync阻塞知道connect完成
+            ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
+            // 连接单位 相当余channel
+            Channel channel = channelFuture.channel();
+            // 发送数据
+            channel.writeAndFlush(request);
+            // sync()阻塞获取结果
+            channel.closeFuture().sync();
+            // 得到别名
+            AttributeKey<RpcResponse> key = AttributeKey.valueOf("RPCResponse");
+            // 找到特定别名下的channel中的内容
+            RpcResponse response = channel.attr(key).get();
+            System.out.println("response = " + response);
+            return response;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}
